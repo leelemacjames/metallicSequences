@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pólya Flow: Linear → Quadratic → Prime-Generating Quadratics</title>
+  <title>Integer Sequences: Tables, Differences, and Graphs</title>
   <style>
     :root{
       --bg:#ffffff;
@@ -11,13 +11,14 @@
       --muted:#666;
       --card:#f4f4f6;
       --line:#d7d7dc;
-      --accent:#2f6fed;
       --ok:#1a7f37;
       --bad:#b42318;
+      --warn:#b54708;
+      --accent:#2f6fed;
     }
     body{
-      margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0;
       background:var(--bg);
       color:var(--ink);
       line-height:1.35;
@@ -27,128 +28,52 @@
       border-bottom:1px solid var(--line);
       background:linear-gradient(180deg, #fff, #fafbff);
     }
-    header h1{ margin:0 0 6px 0; font-size:20px; }
-    header p{ margin:0; color:var(--muted); max-width:980px; }
+    header h1{ margin:0 0 6px 0; font-size:22px; }
+    header p{ margin:0; color:var(--muted); max-width:1000px; }
 
     main{
-      max-width:980px;
+      max-width:1100px;
       margin:0 auto;
-      padding:14px 16px 28px;
+      padding:14px 16px 28px 16px;
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap:14px;
     }
+    @media (max-width: 980px){ main{ grid-template-columns: 1fr; } }
 
-    .pane{
-      display:none;
+    .card{
       background:var(--card);
       border:1px solid var(--line);
       border-radius:14px;
       padding:14px;
       box-shadow:0 1px 0 rgba(0,0,0,0.03);
-      margin-bottom:12px;
     }
-    .pane.active{ display:block; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    label{ font-weight:600; }
 
-    .toprow{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-    .chip{
-      font-size:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      padding:4px 10px;
-      border-radius:999px;
-      color:var(--muted);
-      white-space:nowrap;
-    }
-    .title{
-      font-weight:800;
-      font-size:16px;
-      margin:0;
-    }
-    .muted{ color:var(--muted); }
-
-    .q{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px;
-      margin:10px 0;
-    }
-    .q h3{ margin:0 0 6px 0; font-size:14px; }
-    .q ul, .q ol{ margin:6px 0 0 18px; }
-    .q p{ margin:6px 0 0 0; }
-
-    .nav{
-      display:flex;
-      gap:10px;
-      margin-top:12px;
-      flex-wrap:wrap;
-    }
-    button{
+    select, input[type="number"], button{
       font-size:14px;
       padding:8px 10px;
       border-radius:10px;
       border:1px solid var(--line);
       background:#fff;
-      cursor:pointer;
+      color:var(--ink);
     }
+    button{
+      cursor:pointer;
+      border-color:#cfd7ff;
+      background:#eef2ff;
+    }
+    button:hover{ background:#e7ecff; }
     button.primary{
       background:var(--accent);
       border-color:var(--accent);
       color:#fff;
     }
-    button:disabled{
-      opacity:0.5;
-      cursor:not-allowed;
-    }
+    button.primary:hover{ filter:brightness(0.96); }
 
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:12px;
-      overflow:hidden;
-      margin-top:8px;
-    }
-    thead th{
-      background:#fbfbff;
-      border-bottom:1px solid var(--line);
-      padding:10px 8px;
-      font-size:13px;
-      text-align:center;
-    }
-    tbody td{
-      padding:8px 8px;
-      border-bottom:1px solid #ededf2;
-      text-align:center;
-      font-size:13px;
-    }
-    tbody tr:last-child td{ border-bottom:0; }
-    td.ncol{ font-weight:800; background:#fcfcfd; }
-
-    input.cell{
-      width:110px;
-      max-width:100%;
-      padding:6px 8px;
-      border-radius:10px;
-      border:1px solid #d9d9e3;
-      text-align:center;
-    }
-    input.cell.ok{
-      border-color:rgba(26,127,55,0.55);
-      background:rgba(26,127,55,0.08);
-    }
-    input.cell.bad{
-      border-color:rgba(180,35,24,0.55);
-      background:rgba(180,35,24,0.08);
-    }
-
+    .mini{ font-size:13px; color:var(--muted); margin-top:6px; }
+    .qa{ margin-top:10px; border-top:1px dashed var(--line); padding-top:10px; }
     details{
       background:#fff;
       border:1px solid var(--line);
@@ -158,323 +83,651 @@
     }
     details summary{ cursor:pointer; font-weight:700; }
 
-    .smallnote{ font-size:12px; color:var(--muted); margin-top:8px; }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid var(--line);
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      background:#fbfbff;
+      border-bottom:1px solid var(--line);
+      padding:10px 8px;
+      font-size:13px;
+      text-align:center;
+      z-index:1;
+    }
+    tbody td{
+      border-bottom:1px solid #ededf2;
+      padding:6px 6px;
+      text-align:center;
+      font-size:13px;
+      vertical-align:middle;
+    }
+    tbody tr:last-child td{ border-bottom:0; }
+    td.ncol{ font-weight:700; background:#fcfcfd; }
+    td.readonly{ color:var(--muted); background:#fafafa; }
+
+    /* Difference highlighting */
+    td.diff-ok{
+      color:var(--ok);
+      background:rgba(26,127,55,0.08);
+    }
+    td.diff-bad{
+      color:var(--bad);
+      background:rgba(180,35,24,0.08);
+      font-weight:700;
+    }
+
+    input.cell{
+      width:92px;
+      max-width:100%;
+      padding:6px 8px;
+      border-radius:10px;
+      border:1px solid #d9d9e3;
+      text-align:center;
+    }
+    input.cell:focus{
+      outline:2px solid rgba(47,111,237,0.18);
+      border-color:rgba(47,111,237,0.55);
+    }
+    .ok{
+      border-color:rgba(26,127,55,0.55) !important;
+      background:rgba(26,127,55,0.08) !important;
+    }
+    .bad{
+      border-color:rgba(180,35,24,0.55) !important;
+      background:rgba(180,35,24,0.08) !important;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--muted);
+      margin-left:6px;
+      vertical-align:middle;
+    }
+    .badge.ok{ color:var(--ok); border-color:rgba(26,127,55,0.35); background:rgba(26,127,55,0.08); }
+    .badge.bad{ color:var(--bad); border-color:rgba(180,35,24,0.35); background:rgba(180,35,24,0.08); }
+    .badge.warn{ color:var(--warn); border-color:rgba(181,71,8,0.35); background:rgba(181,71,8,0.08); }
+
+    canvas{
+      width:100%;
+      height:320px;
+      background:#fff;
+      border-radius:14px;
+      border:1px solid var(--line);
+      display:block;
+    }
+    .side h3{ margin:0 0 8px 0; }
+    .side p{ margin:0 0 10px 0; color:var(--muted); }
+
+    .kpi{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .kpi .box{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+    }
+    .kpi .box .t{ font-size:12px; color:var(--muted); }
+    .kpi .box .v{ font-size:18px; font-weight:800; margin-top:4px; }
+
+    .foot{ margin-top:10px; font-size:12px; color:var(--muted); }
+    .scroll{ max-height:460px; overflow:auto; border-radius:12px; }
+    .print-only{ display:none; }
+
+    @media print{
+      header, .no-print{ display:none !important; }
+      main{ max-width:none; padding:0; grid-template-columns:1fr; }
+      .card{ border:0; box-shadow:none; }
+      .print-only{ display:block; }
+      .scroll{ max-height:none; overflow:visible; }
+      canvas{ height:260px; }
+    }
   </style>
 </head>
+
 <body>
-<header>
-  <h1>Pólya Flow: From differences to prime-generating quadratics</h1>
+<header class="no-print">
+  <h1>Build a sequence from a table (and watch the graph appear)</h1>
   <p>
-    Work through the panes. Each one is an “open question” designed for noticing patterns, forming conjectures,
-    and testing them. (No LaTeX needed: we’ll use n<sup>2</sup> formatting.)
+    This worksheet uses <b>differences</b> to detect patterns.
+    A linear sequence has <b>equal first differences</b>. A quadratic sequence has <b>equal second differences</b>.
+    You will test both, then explore prime-generating quadratics (Euler-style).
   </p>
 </header>
 
 <main>
+  <section class="card">
+    <div class="row no-print" style="justify-content:space-between;">
+      <div class="row">
+        <label for="mode">Activity:</label>
+        <select id="mode">
+          <option value="linear">1) Linear: aₙ = 3n + 2</option>
+          <option value="quadratic1">2) Quadratic: aₙ = n² + 1</option>
+          <option value="euler41">3) Euler: E(n) = n² − n + 41</option>
+          <option value="euler1601">4) Euler: n² − 79n + 1601</option>
+          <option value="x2minusxminus1">5) Quadratic: n² − n − 1</option>
+        </select>
 
-  <!-- Pane 1 -->
-  <section class="pane active" data-pane="1">
-    <div class="toprow">
-      <div class="title">Pane 1 — “What must be true?”</div>
-      <div class="chip">Differences • Invariants</div>
-    </div>
+        <label for="N" style="margin-left:6px;">Rows (max n):</label>
+        <input id="N" type="number" min="5" max="200" step="1" value="12"/>
 
-    <div class="q">
-      <h3>Open question</h3>
-      <p>
-        You find a sequence where the <b>first differences</b> are always 5.
-        What can you say <b>for sure</b> about the rule? What can’t you say?
-      </p>
-      <ul>
-        <li>Try making <i>two different</i> sequences with first difference 5.</li>
-        <li>How do they differ?</li>
-      </ul>
-    </div>
-
-    <details>
-      <summary>Hint (optional)</summary>
-      <p class="muted">
-        Constant first difference means “constant step size.” Think of walking with the same stride each time.
-      </p>
-    </details>
-
-    <div class="nav">
-      <button disabled>Back</button>
-      <button class="primary" onclick="go(2)">Next</button>
-    </div>
-  </section>
-
-  <!-- Pane 2 -->
-  <section class="pane" data-pane="2">
-    <div class="toprow">
-      <div class="title">Pane 2 — “Reverse the logic”</div>
-      <div class="chip">Test a claim</div>
-    </div>
-
-    <div class="q">
-      <h3>Open question</h3>
-      <p>
-        Someone claims a sequence comes from a <b>quadratic rule</b> (something like an<sup>2</sup> + bn + c).
-        Without seeing the formula, how could you prove or disprove the claim using only a table?
-      </p>
-      <ul>
-        <li>What should you compute?</li>
-        <li>What “signature” would convince you?</li>
-      </ul>
-    </div>
-
-    <details>
-      <summary>Hint (optional)</summary>
-      <p class="muted">
-        Quadratic sequences have constant <b>second differences</b>.
-      </p>
-    </details>
-
-    <div class="nav">
-      <button onclick="go(1)">Back</button>
-      <button class="primary" onclick="go(3)">Next</button>
-    </div>
-  </section>
-
-  <!-- Pane 3 -->
-  <section class="pane" data-pane="3">
-    <div class="toprow">
-      <div class="title">Pane 3 — “How much evidence is enough?”</div>
-      <div class="chip">Conjecture • Counterexample</div>
-    </div>
-
-    <div class="q">
-      <h3>Open question</h3>
-      <p>
-        How many terms do you need to be <b>certain</b> a sequence is linear?
-        How many to be certain it is quadratic?
-      </p>
-      <ul>
-        <li>Could a sequence look linear for a while and then “break”?</li>
-        <li>Try to design a sequence that imitates a simple rule for the first 6 terms, then changes.</li>
-      </ul>
-    </div>
-
-    <div class="nav">
-      <button onclick="go(2)">Back</button>
-      <button class="primary" onclick="go(4)">Next</button>
-    </div>
-  </section>
-
-  <!-- Pane 4: Euler-style table, formula hidden -->
-  <section class="pane" data-pane="4">
-    <div class="toprow">
-      <div class="title">Pane 4 — Pattern hunt (formula hidden)</div>
-      <div class="chip">Data → Conjecture</div>
-    </div>
-
-    <div class="q">
-      <h3>Open question</h3>
-      <p>
-        Below is a sequence generated by some <b>quadratic rule</b> in n.
-        <b>The formula is hidden.</b> Your job is to spot structure.
-      </p>
-      <ol>
-        <li>Fill the missing a<sub>n</sub> values (use differences to help).</li>
-        <li>What do you notice about the numbers you get?</li>
-        <li>Make a conjecture: what kind of numbers are these (often)?</li>
-      </ol>
-
-      <div class="smallnote">
-        This is a <b>partial list</b>: only some values are shown. Don’t try to guess the formula yet—use patterns.
+        <button id="resetBtn">Reset table</button>
+        <button id="checkBtn" class="primary">Check my work</button>
+        <button id="revealBtn">Reveal remaining values</button>
       </div>
+    </div>
 
+    <div class="qa">
+      <div style="font-weight:800;">Preamble (read, then do)</div>
+      <ul style="margin:8px 0 0 18px;">
+        <li><b>Linear sequence:</b> adds the same amount each step → <b>first differences are constant</b>.</li>
+        <li><b>Quadratic sequence:</b> first differences change steadily → <b>second differences are constant</b>.</li>
+      </ul>
+
+      <details>
+        <summary>Q: What do equal second differences mean?</summary>
+        <div style="margin-top:8px;">
+          <p style="margin:0;">
+            If the <b>second differences</b> are constant, then the sequence comes from a <b>quadratic rule</b>
+            (something like <b>an²+bn+c</b>). Intuitively: the “rate of change” itself changes at a constant rate.
+          </p>
+          <p style="margin:8px 0 0 0;" class="mini">
+            Bonus: for <b>aₙ = an²+bn+c</b>, the constant second difference equals <b>2a</b>.
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Prime-generator prompt (Euler-style)</summary>
+        <div style="margin-top:8px;">
+          <ol style="margin:0 0 0 18px;">
+            <li>Fill values of the polynomial.</li>
+            <li>Watch the <b>prime/composite</b> badge.</li>
+            <li>How long does it keep producing primes?</li>
+          </ol>
+          <p class="mini" style="margin:8px 0 0 0;">
+            Note: the classic Euler polynomial <b>n²−n+41</b> breaks at <b>n=41</b> (it becomes a perfect square).
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="scroll" style="margin-top:12px;">
       <table>
         <thead>
           <tr>
             <th>n</th>
-            <th>a<sub>n</sub> (some given)</th>
-            <th>Δa<sub>n</sub></th>
-            <th>Δ<sup>2</sup>a<sub>n</sub></th>
+            <th>aₙ</th>
+            <th>Δaₙ = aₙ − aₙ₋₁</th>
+            <th>Δ²aₙ = Δaₙ − Δaₙ₋₁</th>
+            <th class="no-print">Prime?</th>
           </tr>
         </thead>
-        <tbody id="eulerTbody"></tbody>
+        <tbody id="tbody"></tbody>
       </table>
-
-      <details>
-        <summary>Teacher reveal (keep closed for students)</summary>
-        <p class="muted" style="margin:6px 0 0 0;">
-          The hidden rule is: <b>n<sup>2</sup> − n + 41</b>. It produces primes for n = 0 to 39, then fails at n = 41
-          because it becomes 41<sup>2</sup>.
-        </p>
-      </details>
     </div>
 
-    <div class="nav">
-      <button onclick="go(3)">Back</button>
-      <button class="primary" onclick="go(5)">Next</button>
+    <div class="foot">
+      Tip: type into the <b>aₙ</b> column. If an <b>aₙ</b> is wrong, the affected differences go <b style="color:var(--bad);">red</b>.
     </div>
   </section>
 
-  <!-- Pane 5 -->
-  <section class="pane" data-pane="5">
-    <div class="toprow">
-      <div class="title">Pane 5 — “Predict the failure”</div>
-      <div class="chip">Structure vs chance</div>
+  <aside class="card side">
+    <h3>Sequence graph (updates as you fill)</h3>
+    <p>Points appear when <i>aₙ</i> is filled. Linear looks like a straight line; quadratic curves.</p>
+    <canvas id="plot"></canvas>
+
+    <div class="kpi">
+      <div class="box">
+        <div class="t">Detected pattern (from differences)</div>
+        <div class="v" id="pattern">—</div>
+      </div>
+      <div class="box">
+        <div class="t">Prime streak (from n=0)</div>
+        <div class="v" id="streak">—</div>
+      </div>
     </div>
 
-    <div class="q">
-      <h3>Open question</h3>
-      <p>
-        Suppose you find a quadratic rule that gives prime numbers for many consecutive n.
-        If it eventually fails, do you think it fails by <b>chance</b> or by <b>structure</b>?
-      </p>
-      <ul>
-        <li>What kind of n might be “dangerous” for a quadratic?</li>
-        <li>Could the rule ever produce a perfect square? What would that mean?</li>
-      </ul>
-    </div>
-
-    <details>
-      <summary>Optional extension</summary>
-      <p class="muted">
-        Try another Euler-style polynomial: n<sup>2</sup> − 79n + 1601.
-        What n makes it obviously composite?
-      </p>
+    <details class="no-print">
+      <summary>Teacher note / extension</summary>
+      <div style="margin-top:8px; color:var(--muted); font-size:13px;">
+        Ask learners to predict the next term using differences alone, then verify against the rule.
+        For Euler: explain why <b>E(41)=41²</b> is composite, and why <b>n²−79n+1601</b> breaks at <b>n=80</b>.
+      </div>
     </details>
-
-    <div class="nav">
-      <button onclick="go(4)">Back</button>
-      <button disabled class="primary">End</button>
-    </div>
-  </section>
-
+  </aside>
 </main>
 
 <script>
-  // Pane navigation
-  function go(k){
-    document.querySelectorAll(".pane").forEach(p => p.classList.remove("active"));
-    document.querySelector(`.pane[data-pane="${k}"]`).classList.add("active");
-    window.scrollTo({top:0, behavior:"smooth"});
-  }
+  // ---------- helpers ----------
+  const isInt = (v) => Number.isFinite(v) && Math.floor(v) === v;
 
-  // --- Pane 4 table: partial list for the hidden formula sequence ---
-  // We will generate the "truth" from n^2 - n + 41 internally,
-  // but we will only SHOW some values and leave others blank for students.
-  // (So the formula remains hidden in the student view.)
-  function hiddenSequence(n){
-    return n*n - n + 41;
-  }
-
-  const givenNs = new Set([0, 1, 2, 3, 4, 6, 7, 9]); // partial list: these are shown
-  const maxN = 12; // keep it small for the “pattern hunt” pane
-
-  const eulerTbody = document.getElementById("eulerTbody");
-
-  function addRow(n){
-    const tr = document.createElement("tr");
-
-    const tdN = document.createElement("td");
-    tdN.className = "ncol";
-    tdN.textContent = n;
-
-    const tdA = document.createElement("td");
-    const inp = document.createElement("input");
-    inp.className = "cell";
-    inp.type = "number";
-    inp.step = "1";
-    inp.inputMode = "numeric";
-
-    const truth = hiddenSequence(n);
-    if(givenNs.has(n)){
-      inp.value = truth;
-      inp.dataset.locked = "1";
-      inp.readOnly = true;
-      inp.classList.add("ok");
-      inp.title = "Given";
-    }else{
-      inp.placeholder = "…";
-      inp.dataset.locked = "0";
-      inp.addEventListener("input", updateDiffs);
+  function isPrime(n){
+    if(!isInt(n) || n < 2) return false;
+    if(n % 2 === 0) return n === 2;
+    const r = Math.floor(Math.sqrt(n));
+    for(let k=3; k<=r; k+=2){
+      if(n % k === 0) return false;
     }
-    inp.dataset.truth = String(truth);
-    inp.dataset.n = String(n);
-    tdA.appendChild(inp);
-
-    const tdD1 = document.createElement("td");
-    tdD1.textContent = "—";
-    tdD1.className = "muted";
-
-    const tdD2 = document.createElement("td");
-    tdD2.textContent = "—";
-    tdD2.className = "muted";
-
-    tr.appendChild(tdN);
-    tr.appendChild(tdA);
-    tr.appendChild(tdD1);
-    tr.appendChild(tdD2);
-    eulerTbody.appendChild(tr);
+    return true;
   }
 
-  for(let n=0; n<=maxN; n++) addRow(n);
-
-  function getA(n){
-    const inp = eulerTbody.querySelector(`input[data-n="${n}"]`);
-    if(!inp) return null;
-    const raw = (inp.value || "").trim();
-    if(raw === "") return null;
-    const v = Number(raw);
-    return Number.isFinite(v) ? v : null;
+  function seqValue(mode, n){
+    if(mode === "linear") return 3*n + 2;
+    if(mode === "quadratic1") return n*n + 1;
+    if(mode === "euler41") return n*n - n + 41;
+    if(mode === "euler1601") return n*n - 79*n + 1601;
+    // n^2 - n - 1
+    return n*n - n - 1;
   }
 
-  function markInput(inp){
-    const raw = (inp.value || "").trim();
-    inp.classList.remove("ok","bad");
-    if(raw === "") return;
-    const v = Number(raw);
-    const truth = Number(inp.dataset.truth);
-    if(Number.isFinite(v) && Math.floor(v) === v && v === truth) inp.classList.add("ok");
-    else inp.classList.add("bad");
+  function isPrimeMode(mode){
+    return (mode === "euler41" || mode === "euler1601");
   }
 
-  function updateDiffs(){
-    // mark all editable inputs as correct/incorrect, then compute diffs where possible
-    const inputs = eulerTbody.querySelectorAll("input.cell");
-    inputs.forEach(inp => {
-      if(inp.dataset.locked === "0") markInput(inp);
+  // How many initial values to prefill (rest blank for students)
+  function prefillCount(mode, N){
+    if(mode === "linear") return Math.min(4, N+1);
+    if(mode === "quadratic1") return Math.min(4, N+1);
+    if(mode === "x2minusxminus1") return Math.min(4, N+1);
+    // Euler modes: show a couple then let them fill
+    return Math.min(3, N+1);
+  }
+
+  function suggestedN(mode){
+    if(mode === "euler41") return 41;
+    if(mode === "euler1601") return 80;
+    return 12;
+  }
+
+  // ---------- UI wiring ----------
+  const tbody = document.getElementById("tbody");
+  const modeSel = document.getElementById("mode");
+  const NInput = document.getElementById("N");
+  const resetBtn = document.getElementById("resetBtn");
+  const checkBtn = document.getElementById("checkBtn");
+  const revealBtn = document.getElementById("revealBtn");
+
+  const patternEl = document.getElementById("pattern");
+  const streakEl = document.getElementById("streak");
+
+  const canvas = document.getElementById("plot");
+  const ctx = canvas.getContext("2d");
+
+  function getRows(){
+    const rows = [];
+    const trs = tbody.querySelectorAll("tr");
+    trs.forEach(tr => {
+      const n = parseInt(tr.dataset.n, 10);
+      const inp = tr.querySelector("input");
+      const val = inp.value.trim() === "" ? null : Number(inp.value);
+      const truth = seqValue(modeSel.value, n);
+      const correct = (val !== null && isInt(val) && val === truth);
+      rows.push({n, input: inp, val, truth, correct, tr});
+    });
+    return rows;
+  }
+
+  function buildTable(){
+    const mode = modeSel.value;
+    let N = Number(NInput.value);
+    if(!isInt(N) || N < 5) N = suggestedN(mode);
+    if(N > 200) N = 200;
+    NInput.value = N;
+
+    tbody.innerHTML = "";
+    const pre = prefillCount(mode, N);
+
+    for(let n=0; n<=N; n++){
+      const tr = document.createElement("tr");
+      tr.dataset.n = String(n);
+
+      const tdN = document.createElement("td");
+      tdN.className = "ncol";
+      tdN.textContent = n;
+
+      const tdA = document.createElement("td");
+      const inp = document.createElement("input");
+      inp.className = "cell";
+      inp.type = "number";
+      inp.step = "1";
+      inp.inputMode = "numeric";
+      inp.placeholder = (n < pre ? "" : "…");
+      if(n < pre) inp.value = seqValue(mode, n);
+
+      inp.addEventListener("input", () => {
+        inp.classList.remove("ok","bad");
+        updateDerived(); // live update: diffs go red if wrong
+      });
+      tdA.appendChild(inp);
+
+      const tdD1 = document.createElement("td");
+      tdD1.className = "readonly";
+      tdD1.textContent = "—";
+
+      const tdD2 = document.createElement("td");
+      tdD2.className = "readonly";
+      tdD2.textContent = "—";
+
+      const tdP = document.createElement("td");
+      tdP.className = "no-print";
+      tdP.textContent = "—";
+
+      tr.appendChild(tdN);
+      tr.appendChild(tdA);
+      tr.appendChild(tdD1);
+      tr.appendChild(tdD2);
+      tr.appendChild(tdP);
+
+      tbody.appendChild(tr);
+    }
+    updateDerived();
+    drawPlot();
+  }
+
+  function setDiffCell(td, text, status){ // status: "ok" | "bad" | "neutral"
+    td.textContent = text;
+    td.classList.remove("diff-ok", "diff-bad");
+    if(status === "ok") td.classList.add("diff-ok");
+    if(status === "bad") td.classList.add("diff-bad");
+  }
+
+  function updateDerived(){
+    const mode = modeSel.value;
+    const rows = getRows();
+
+    // Prime/composite badges + differences (and difference highlighting)
+    const d1 = Array(rows.length).fill(null);
+    const d1Status = Array(rows.length).fill("neutral"); // ok/bad/neutral
+    const d2 = Array(rows.length).fill(null);
+    const d2Status = Array(rows.length).fill("neutral");
+
+    rows.forEach((r, i) => {
+      const tds = r.tr.querySelectorAll("td");
+      const tdD1 = tds[2];
+      const tdD2 = tds[3];
+      const tdP  = tds[4];
+
+      // Prime badge (only meaningful if value is >=2 and integer)
+      if(r.val === null || !isInt(r.val)){
+        tdP.innerHTML = "—";
+      }else{
+        const p = isPrime(r.val);
+        tdP.innerHTML = p
+          ? '<span class="badge ok">prime</span>'
+          : '<span class="badge bad">composite</span>';
+      }
+
+      // First difference at row i: a_i - a_{i-1}
+      if(i === 0){
+        setDiffCell(tdD1, "—", "neutral");
+      }else{
+        const aPrev = rows[i-1].val;
+        const aCur = r.val;
+        if(aPrev === null || aCur === null || !isInt(aPrev) || !isInt(aCur)){
+          setDiffCell(tdD1, "—", "neutral");
+        }else{
+          const v = aCur - aPrev;
+          d1[i] = v;
+          // If either aPrev or aCur is incorrect (given it's filled), flag bad
+          const bad = (!rows[i-1].correct) || (!r.correct);
+          d1Status[i] = bad ? "bad" : "ok";
+          setDiffCell(tdD1, String(v), d1Status[i]);
+        }
+      }
+
+      // Second difference at row i: d1_i - d1_{i-1}
+      if(i <= 1){
+        setDiffCell(tdD2, "—", "neutral");
+      }else{
+        if(d1[i] === null || d1[i-1] === null){
+          setDiffCell(tdD2, "—", "neutral");
+        }else{
+          const v = d1[i] - d1[i-1];
+          d2[i] = v;
+          // If either contributing first difference is bad, mark second diff bad
+          const bad = (d1Status[i] === "bad") || (d1Status[i-1] === "bad");
+          d2Status[i] = bad ? "bad" : "ok";
+          setDiffCell(tdD2, String(v), d2Status[i]);
+        }
+      }
     });
 
-    // compute differences using current entries
-    for(let n=0; n<=maxN; n++){
-      const tr = eulerTbody.children[n];
-      const tdD1 = tr.children[2];
-      const tdD2 = tr.children[3];
+    // Pattern detector: ignore rows where diffs are neutral (missing) OR bad (wrong sequence)
+    const goodD1 = d1.filter((v, i) => v !== null && d1Status[i] === "ok");
+    const goodD2 = d2.filter((v, i) => v !== null && d2Status[i] === "ok");
 
-      const a = getA(n);
-      const aPrev = getA(n-1);
-      const aPrev2 = getA(n-2);
+    const isConst = (arr) => arr.length >= 3 && arr.every(v => v === arr[0]);
 
-      // first diff
-      let d1 = null, d1Prev = null;
-      if(n >= 1 && a !== null && aPrev !== null){
-        d1 = a - aPrev;
-        tdD1.textContent = String(d1);
-        tdD1.classList.remove("muted");
-      }else{
-        tdD1.textContent = "—";
-        tdD1.classList.add("muted");
+    let pat = "—";
+    if(isConst(goodD1)) pat = "Linear (Δ constant)";
+    else if(isConst(goodD2)) pat = "Quadratic (Δ² constant)";
+    else if(goodD1.length >= 3) pat = "Neither (or incomplete / wrong)";
+    patternEl.textContent = pat;
+
+    // Prime streak (only for prime-generator modes): count consecutive primes from n=0 until first composite/missing
+    if(isPrimeMode(mode)){
+      let streak = 0;
+      for(let i=0; i<rows.length; i++){
+        const v = rows[i].val;
+        if(v === null || !isInt(v)) break;
+        if(isPrime(v)) streak++;
+        else break;
       }
-
-      // second diff
-      if(n >= 2 && a !== null && aPrev !== null && aPrev2 !== null){
-        d1Prev = aPrev - aPrev2;
-        const d2 = d1 - d1Prev;
-        tdD2.textContent = String(d2);
-        tdD2.classList.remove("muted");
-      }else{
-        tdD2.textContent = "—";
-        tdD2.classList.add("muted");
+      // Also compute the "true" streak from the formula (starting at n=0)
+      let trueStreak = 0;
+      for(let n=0; n<=500; n++){
+        const v = seqValue(mode, n);
+        if(isPrime(v)) trueStreak++;
+        else break;
       }
+      streakEl.textContent = `${streak} (filled) • true streak: ${trueStreak}`;
+    }else{
+      streakEl.textContent = "—";
     }
+
+    drawPlot();
   }
 
-  updateDiffs();
+  function resetMarks(){
+    getRows().forEach(r => r.input.classList.remove("ok","bad"));
+  }
+
+  function checkWork(){
+    const rows = getRows();
+    resetMarks();
+    let correct = 0, attempted = 0;
+
+    rows.forEach(r => {
+      const raw = r.input.value.trim();
+      if(raw === "") return;
+      attempted++;
+      const v = Number(raw);
+      if(isInt(v) && v === r.truth){
+        r.input.classList.add("ok");
+        correct++;
+      }else{
+        r.input.classList.add("bad");
+      }
+    });
+
+    if(attempted > 0){
+      patternEl.textContent = `${correct}/${attempted} correct • ${patternEl.textContent}`;
+    }
+    updateDerived(); // ensure diff red/green matches correctness
+  }
+
+  function revealAll(){
+    const mode = modeSel.value;
+    const rows = getRows();
+    rows.forEach(r => {
+      if(r.input.value.trim() === ""){
+        r.input.value = seqValue(mode, r.n);
+      }
+      r.input.classList.remove("bad");
+      r.input.classList.add("ok");
+    });
+    updateDerived();
+  }
+
+  // ---------- plotting (responsive, not distorted) ----------
+  let lastW = 0, lastH = 0;
+
+  function resizeCanvasIfNeeded(){
+    const cssW = Math.max(200, Math.floor(canvas.clientWidth));
+    const cssH = Math.max(220, Math.floor(canvas.clientHeight));
+    const dpr = window.devicePixelRatio || 1;
+    const newW = Math.floor(cssW * dpr);
+    const newH = Math.floor(cssH * dpr);
+    if(newW !== lastW || newH !== lastH){
+      canvas.width = newW;
+      canvas.height = newH;
+      lastW = newW; lastH = newH;
+      ctx.setTransform(dpr,0,0,dpr,0,0); // draw in CSS pixels
+    }
+    return {cssW, cssH};
+  }
+
+  function drawPlot(){
+    const {cssW, cssH} = resizeCanvasIfNeeded();
+    ctx.clearRect(0,0,cssW,cssH);
+
+    const rows = getRows().filter(r => r.val !== null && isInt(r.val));
+    if(rows.length === 0){
+      ctx.save();
+      ctx.font = "16px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      ctx.fillStyle = "#666";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Fill aₙ values to see the graph appear.", cssW/2, cssH/2);
+      ctx.restore();
+      return;
+    }
+
+    const xs = rows.map(r => r.n);
+    const ys = rows.map(r => r.val);
+    const xmin = Math.min(...xs), xmax = Math.max(...xs);
+    let ymin = Math.min(...ys), ymax = Math.max(...ys);
+
+    // Pad bounds to avoid "squashed" look when range is small
+    const yRange = Math.max(1, ymax - ymin);
+    const pad = Math.max(2, Math.round(0.08 * yRange));
+    ymin -= pad;
+    ymax += pad;
+
+    const padL = 52, padR = 16, padT = 16, padB = 38;
+    const W = cssW - padL - padR;
+    const H = cssH - padT - padB;
+
+    const xScale = (x) => padL + (x - xmin) * (W / Math.max(1,(xmax - xmin)));
+    const yScale = (y) => padT + (ymax - y) * (H / Math.max(1,(ymax - ymin)));
+
+    // axes
+    ctx.save();
+    ctx.strokeStyle = "#d7d7dc";
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.moveTo(padL, padT + H);
+    ctx.lineTo(padL + W, padT + H);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(padL, padT);
+    ctx.lineTo(padL, padT + H);
+    ctx.stroke();
+
+    // labels
+    ctx.fillStyle = "#666";
+    ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("n", padL + W/2, cssH - 12);
+    ctx.save();
+    ctx.translate(16, padT + H/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText("aₙ", 0, 0);
+    ctx.restore();
+
+    // ticks
+    const xticks = Math.min(7, (xmax - xmin + 1));
+    for(let i=0;i<xticks;i++){
+      const x = xmin + i * ((xmax - xmin) / Math.max(1,(xticks-1)));
+      const px = xScale(x);
+      ctx.beginPath();
+      ctx.moveTo(px, padT + H);
+      ctx.lineTo(px, padT + H + 5);
+      ctx.stroke();
+      ctx.textAlign = "center";
+      ctx.fillText(String(Math.round(x)), px, padT + H + 18);
+    }
+    const yticks = 5;
+    for(let i=0;i<yticks;i++){
+      const y = ymin + i * ((ymax - ymin) / Math.max(1,(yticks-1)));
+      const py = yScale(y);
+      ctx.beginPath();
+      ctx.moveTo(padL - 5, py);
+      ctx.lineTo(padL, py);
+      ctx.stroke();
+      ctx.textAlign = "right";
+      ctx.fillText(String(Math.round(y)), padL - 8, py + 4);
+    }
+
+    // line
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    rows.sort((a,b)=>a.n-b.n).forEach((r, idx) => {
+      const px = xScale(r.n);
+      const py = yScale(r.val);
+      if(idx === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+
+    // points
+    ctx.fillStyle = "#111";
+    rows.forEach(r => {
+      const px = xScale(r.n);
+      const py = yScale(r.val);
+      ctx.beginPath();
+      ctx.arc(px, py, 3.5, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    ctx.restore();
+  }
+
+  // ---------- events ----------
+  modeSel.addEventListener("change", () => {
+    NInput.value = suggestedN(modeSel.value);
+    buildTable();
+  });
+  NInput.addEventListener("change", buildTable);
+  resetBtn.addEventListener("click", buildTable);
+  checkBtn.addEventListener("click", checkWork);
+  revealBtn.addEventListener("click", revealAll);
+
+  // redraw on resize for crispness
+  window.addEventListener("resize", () => drawPlot());
+
+  buildTable();
 </script>
 </body>
 </html>
+
