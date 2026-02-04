@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pólya Flow: Linear → Quadratic → Prime-Generating Quadratics</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --ink:#111;
+      --muted:#666;
+      --card:#f4f4f6;
+      --line:#d7d7dc;
+      --accent:#2f6fed;
+      --ok:#1a7f37;
+      --bad:#b42318;
+    }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      line-height:1.35;
+    }
+    header{
+      padding:18px 16px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg, #fff, #fafbff);
+    }
+    header h1{ margin:0 0 6px 0; font-size:20px; }
+    header p{ margin:0; color:var(--muted); max-width:980px; }
+
+    main{
+      max-width:980px;
+      margin:0 auto;
+      padding:14px 16px 28px;
+    }
+
+    .pane{
+      display:none;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      box-shadow:0 1px 0 rgba(0,0,0,0.03);
+      margin-bottom:12px;
+    }
+    .pane.active{ display:block; }
+
+    .toprow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .chip{
+      font-size:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      padding:4px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .title{
+      font-weight:800;
+      font-size:16px;
+      margin:0;
+    }
+    .muted{ color:var(--muted); }
+
+    .q{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      margin:10px 0;
+    }
+    .q h3{ margin:0 0 6px 0; font-size:14px; }
+    .q ul, .q ol{ margin:6px 0 0 18px; }
+    .q p{ margin:6px 0 0 0; }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    button{
+      font-size:14px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#fff;
+      cursor:pointer;
+    }
+    button.primary{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+    }
+    button:disabled{
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+      margin-top:8px;
+    }
+    thead th{
+      background:#fbfbff;
+      border-bottom:1px solid var(--line);
+      padding:10px 8px;
+      font-size:13px;
+      text-align:center;
+    }
+    tbody td{
+      padding:8px 8px;
+      border-bottom:1px solid #ededf2;
+      text-align:center;
+      font-size:13px;
+    }
+    tbody tr:last-child td{ border-bottom:0; }
+    td.ncol{ font-weight:800; background:#fcfcfd; }
+
+    input.cell{
+      width:110px;
+      max-width:100%;
+      padding:6px 8px;
+      border-radius:10px;
+      border:1px solid #d9d9e3;
+      text-align:center;
+    }
+    input.cell.ok{
+      border-color:rgba(26,127,55,0.55);
+      background:rgba(26,127,55,0.08);
+    }
+    input.cell.bad{
+      border-color:rgba(180,35,24,0.55);
+      background:rgba(180,35,24,0.08);
+    }
+
+    details{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      margin-top:10px;
+    }
+    details summary{ cursor:pointer; font-weight:700; }
+
+    .smallnote{ font-size:12px; color:var(--muted); margin-top:8px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Pólya Flow: From differences to prime-generating quadratics</h1>
+  <p>
+    Work through the panes. Each one is an “open question” designed for noticing patterns, forming conjectures,
+    and testing them. (No LaTeX needed: we’ll use n<sup>2</sup> formatting.)
+  </p>
+</header>
+
+<main>
+
+  <!-- Pane 1 -->
+  <section class="pane active" data-pane="1">
+    <div class="toprow">
+      <div class="title">Pane 1 — “What must be true?”</div>
+      <div class="chip">Differences • Invariants</div>
+    </div>
+
+    <div class="q">
+      <h3>Open question</h3>
+      <p>
+        You find a sequence where the <b>first differences</b> are always 5.
+        What can you say <b>for sure</b> about the rule? What can’t you say?
+      </p>
+      <ul>
+        <li>Try making <i>two different</i> sequences with first difference 5.</li>
+        <li>How do they differ?</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary>Hint (optional)</summary>
+      <p class="muted">
+        Constant first difference means “constant step size.” Think of walking with the same stride each time.
+      </p>
+    </details>
+
+    <div class="nav">
+      <button disabled>Back</button>
+      <button class="primary" onclick="go(2)">Next</button>
+    </div>
+  </section>
+
+  <!-- Pane 2 -->
+  <section class="pane" data-pane="2">
+    <div class="toprow">
+      <div class="title">Pane 2 — “Reverse the logic”</div>
+      <div class="chip">Test a claim</div>
+    </div>
+
+    <div class="q">
+      <h3>Open question</h3>
+      <p>
+        Someone claims a sequence comes from a <b>quadratic rule</b> (something like an<sup>2</sup> + bn + c).
+        Without seeing the formula, how could you prove or disprove the claim using only a table?
+      </p>
+      <ul>
+        <li>What should you compute?</li>
+        <li>What “signature” would convince you?</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary>Hint (optional)</summary>
+      <p class="muted">
+        Quadratic sequences have constant <b>second differences</b>.
+      </p>
+    </details>
+
+    <div class="nav">
+      <button onclick="go(1)">Back</button>
+      <button class="primary" onclick="go(3)">Next</button>
+    </div>
+  </section>
+
+  <!-- Pane 3 -->
+  <section class="pane" data-pane="3">
+    <div class="toprow">
+      <div class="title">Pane 3 — “How much evidence is enough?”</div>
+      <div class="chip">Conjecture • Counterexample</div>
+    </div>
+
+    <div class="q">
+      <h3>Open question</h3>
+      <p>
+        How many terms do you need to be <b>certain</b> a sequence is linear?
+        How many to be certain it is quadratic?
+      </p>
+      <ul>
+        <li>Could a sequence look linear for a while and then “break”?</li>
+        <li>Try to design a sequence that imitates a simple rule for the first 6 terms, then changes.</li>
+      </ul>
+    </div>
+
+    <div class="nav">
+      <button onclick="go(2)">Back</button>
+      <button class="primary" onclick="go(4)">Next</button>
+    </div>
+  </section>
+
+  <!-- Pane 4: Euler-style table, formula hidden -->
+  <section class="pane" data-pane="4">
+    <div class="toprow">
+      <div class="title">Pane 4 — Pattern hunt (formula hidden)</div>
+      <div class="chip">Data → Conjecture</div>
+    </div>
+
+    <div class="q">
+      <h3>Open question</h3>
+      <p>
+        Below is a sequence generated by some <b>quadratic rule</b> in n.
+        <b>The formula is hidden.</b> Your job is to spot structure.
+      </p>
+      <ol>
+        <li>Fill the missing a<sub>n</sub> values (use differences to help).</li>
+        <li>What do you notice about the numbers you get?</li>
+        <li>Make a conjecture: what kind of numbers are these (often)?</li>
+      </ol>
+
+      <div class="smallnote">
+        This is a <b>partial list</b>: only some values are shown. Don’t try to guess the formula yet—use patterns.
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>n</th>
+            <th>a<sub>n</sub> (some given)</th>
+            <th>Δa<sub>n</sub></th>
+            <th>Δ<sup>2</sup>a<sub>n</sub></th>
+          </tr>
+        </thead>
+        <tbody id="eulerTbody"></tbody>
+      </table>
+
+      <details>
+        <summary>Teacher reveal (keep closed for students)</summary>
+        <p class="muted" style="margin:6px 0 0 0;">
+          The hidden rule is: <b>n<sup>2</sup> − n + 41</b>. It produces primes for n = 0 to 39, then fails at n = 41
+          because it becomes 41<sup>2</sup>.
+        </p>
+      </details>
+    </div>
+
+    <div class="nav">
+      <button onclick="go(3)">Back</button>
+      <button class="primary" onclick="go(5)">Next</button>
+    </div>
+  </section>
+
+  <!-- Pane 5 -->
+  <section class="pane" data-pane="5">
+    <div class="toprow">
+      <div class="title">Pane 5 — “Predict the failure”</div>
+      <div class="chip">Structure vs chance</div>
+    </div>
+
+    <div class="q">
+      <h3>Open question</h3>
+      <p>
+        Suppose you find a quadratic rule that gives prime numbers for many consecutive n.
+        If it eventually fails, do you think it fails by <b>chance</b> or by <b>structure</b>?
+      </p>
+      <ul>
+        <li>What kind of n might be “dangerous” for a quadratic?</li>
+        <li>Could the rule ever produce a perfect square? What would that mean?</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary>Optional extension</summary>
+      <p class="muted">
+        Try another Euler-style polynomial: n<sup>2</sup> − 79n + 1601.
+        What n makes it obviously composite?
+      </p>
+    </details>
+
+    <div class="nav">
+      <button onclick="go(4)">Back</button>
+      <button disabled class="primary">End</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Pane navigation
+  function go(k){
+    document.querySelectorAll(".pane").forEach(p => p.classList.remove("active"));
+    document.querySelector(`.pane[data-pane="${k}"]`).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  // --- Pane 4 table: partial list for the hidden formula sequence ---
+  // We will generate the "truth" from n^2 - n + 41 internally,
+  // but we will only SHOW some values and leave others blank for students.
+  // (So the formula remains hidden in the student view.)
+  function hiddenSequence(n){
+    return n*n - n + 41;
+  }
+
+  const givenNs = new Set([0, 1, 2, 3, 4, 6, 7, 9]); // partial list: these are shown
+  const maxN = 12; // keep it small for the “pattern hunt” pane
+
+  const eulerTbody = document.getElementById("eulerTbody");
+
+  function addRow(n){
+    const tr = document.createElement("tr");
+
+    const tdN = document.createElement("td");
+    tdN.className = "ncol";
+    tdN.textContent = n;
+
+    const tdA = document.createElement("td");
+    const inp = document.createElement("input");
+    inp.className = "cell";
+    inp.type = "number";
+    inp.step = "1";
+    inp.inputMode = "numeric";
+
+    const truth = hiddenSequence(n);
+    if(givenNs.has(n)){
+      inp.value = truth;
+      inp.dataset.locked = "1";
+      inp.readOnly = true;
+      inp.classList.add("ok");
+      inp.title = "Given";
+    }else{
+      inp.placeholder = "…";
+      inp.dataset.locked = "0";
+      inp.addEventListener("input", updateDiffs);
+    }
+    inp.dataset.truth = String(truth);
+    inp.dataset.n = String(n);
+    tdA.appendChild(inp);
+
+    const tdD1 = document.createElement("td");
+    tdD1.textContent = "—";
+    tdD1.className = "muted";
+
+    const tdD2 = document.createElement("td");
+    tdD2.textContent = "—";
+    tdD2.className = "muted";
+
+    tr.appendChild(tdN);
+    tr.appendChild(tdA);
+    tr.appendChild(tdD1);
+    tr.appendChild(tdD2);
+    eulerTbody.appendChild(tr);
+  }
+
+  for(let n=0; n<=maxN; n++) addRow(n);
+
+  function getA(n){
+    const inp = eulerTbody.querySelector(`input[data-n="${n}"]`);
+    if(!inp) return null;
+    const raw = (inp.value || "").trim();
+    if(raw === "") return null;
+    const v = Number(raw);
+    return Number.isFinite(v) ? v : null;
+  }
+
+  function markInput(inp){
+    const raw = (inp.value || "").trim();
+    inp.classList.remove("ok","bad");
+    if(raw === "") return;
+    const v = Number(raw);
+    const truth = Number(inp.dataset.truth);
+    if(Number.isFinite(v) && Math.floor(v) === v && v === truth) inp.classList.add("ok");
+    else inp.classList.add("bad");
+  }
+
+  function updateDiffs(){
+    // mark all editable inputs as correct/incorrect, then compute diffs where possible
+    const inputs = eulerTbody.querySelectorAll("input.cell");
+    inputs.forEach(inp => {
+      if(inp.dataset.locked === "0") markInput(inp);
+    });
+
+    // compute differences using current entries
+    for(let n=0; n<=maxN; n++){
+      const tr = eulerTbody.children[n];
+      const tdD1 = tr.children[2];
+      const tdD2 = tr.children[3];
+
+      const a = getA(n);
+      const aPrev = getA(n-1);
+      const aPrev2 = getA(n-2);
+
+      // first diff
+      let d1 = null, d1Prev = null;
+      if(n >= 1 && a !== null && aPrev !== null){
+        d1 = a - aPrev;
+        tdD1.textContent = String(d1);
+        tdD1.classList.remove("muted");
+      }else{
+        tdD1.textContent = "—";
+        tdD1.classList.add("muted");
+      }
+
+      // second diff
+      if(n >= 2 && a !== null && aPrev !== null && aPrev2 !== null){
+        d1Prev = aPrev - aPrev2;
+        const d2 = d1 - d1Prev;
+        tdD2.textContent = String(d2);
+        tdD2.classList.remove("muted");
+      }else{
+        tdD2.textContent = "—";
+        tdD2.classList.add("muted");
+      }
+    }
+  }
+
+  updateDiffs();
+</script>
+</body>
+</html>
